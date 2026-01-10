@@ -39,15 +39,15 @@ There's a `scripts/` folder containing `populate_data.py` which will create `tra
 # Defined interface and tasks:
 
 - [x] Create a GitHub repo with the project skeleton in place.
-- [] Implement the UNet model -- inside `models.py`. 
+- [ ] Implement the UNet model -- inside `models.py`. 
     - It should output in the form `(BATCH_SIZE, 2, WIDTH, HEIGHT)` and take inputs of the form `(BATCH_SIZE, 1, WIDTH, HEIGHT)`.
-- [] Implement the validation loop -- inside `training.py`, specifically `eval_model()`.
-- [] Implement preprocessing -- inside `source/preprocessing/`. 
+- [ ] Implement the validation loop -- inside `training.py`, specifically `eval_model()`.
+- [ ] Implement preprocessing -- inside `source/preprocessing/`. 
     - It should create `train_X.npy`, `train_Y.npy`, `test_X.npy`, `test_Y.npy`. 
     - `X`s have shape `(1, WIDTH, HEIGHT)`, and `Y`s have shape `(1, WIDTH, HEIGHT)` -- the same, but different from model output (because of `CrossEntropyLoss`).
     - Find an appropriate dataset with *one channel* inputs and *one channel* outputs -- check with me if unsure.
 - [x] Create a training loop.
-- [] Implement postprocessing -- inside `source/postprocessing`.
+- [ ] Implement postprocessing -- inside `source/postprocessing`.
     - Find good segmentation metrics and calculate them for the trained model on the test dataset.
     - Show a few examples -- run them through the model and display them.
     - Plot training and testing losses over the course of traininig. They will be arrays, indexed by epoch, inside `output/training_losses.npy` and `output/testing_losses.npy`.
