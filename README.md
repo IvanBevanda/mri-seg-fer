@@ -13,7 +13,7 @@ Perform the following steps:
 1. Install [Git](https://git-scm.com/install/windows).
 2. Create a [GitHub account](https://github.com/) with the official @fer.hr address.
 3. Clone this repository. [Guide](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository?platform=windows&tool=webui). This part may be tricky due to authentication issues.
-4. Create empty `data/` and `output` folders inside the repository.
+4. Create empty `data/` and `output/` folders inside the repository.
 5. Change into this repository: `cd mri-seg-fer`.
 6. Install everything from `requirements.txt`: `py -m pip install -r requirements.txt`.
 
