@@ -59,10 +59,27 @@ def train_epoch(model, optimizer, loss_function, trainx_path, trainy_path, batch
     return total_loss
 
 
-def eval_model():
-    # TODO
-    return 10.0
+def eval_model(model, loss_function, testx_path, testy_path, batch_size):
+    X = torch.from_numpy(np.load(testx_path)).float()
+    Y = torch.from_numpy(np.load(testy_path)).long()
+    dataset = torch.utils.data.TensorDataset(X, Y)
+    test_loader = torch.utils.data.DataLoader(
+        dataset=dataset, batch_size=batch_size, shuffle=True
+    )
 
+    model.eval()
+
+    total_loss = 0
+    for x, y in tqdm.tqdm(test_loader):
+        x = x.to(DEVICE)
+        y = y.to(DEVICE)
+
+        output = model(x)
+        loss = loss_function(output, y)
+
+        total_loss += loss.item()
+
+    return total_loss
 
 def train_network(
     selected_model,
@@ -89,7 +106,7 @@ def train_network(
         train_loss = train_epoch(
             model, optimizer, loss_function, trainx_path, trainy_path, batch_size
         )
-        test_loss = eval_model()
+        test_loss = eval_model(model, loss_function, testx_path, testy_path, 1)
         print(f"Epoch {epoch} training loss: {train_loss}")
         print(f"Epoch {epoch} testing loss: {test_loss}")
 

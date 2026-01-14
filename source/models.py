@@ -4,7 +4,7 @@ import numpy as np
 
 class UNet(nn.Module):
 
-    def __init__(self, in_channels=1, out_channels=1, base_filters=16, apply_sigmoid=False):
+    def __init__(self, in_channels=1, out_channels=2, base_filters=16, apply_sigmoid=False):
         super(UNet, self).__init__()
         self.apply_sigmoid = apply_sigmoid
 
