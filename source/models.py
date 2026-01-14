@@ -8,7 +8,7 @@ class UNet(nn.Module):
         super(UNet, self).__init__()
         self.apply_sigmoid = apply_sigmoid
 
-        def conv2d_block(cin, cout, dropout_p=0.0):
+        def conv2d_block(cin, cout):
             return nn.Sequential(
                 nn.Conv2d(cin, cout, kernel_size=3, padding=1, bias=False),
                 nn.BatchNorm2d(cout),
@@ -17,40 +17,38 @@ class UNet(nn.Module):
                 nn.Conv2d(cout, cout, kernel_size=3, padding=1, bias=False),
                 nn.BatchNorm2d(cout),
                 nn.ReLU(inplace=True),
-
-                nn.Dropout2d(dropout_p) if dropout_p and dropout_p > 0 else nn.Identity(),
             )
 
         f = base_filters
 
         # Encoder
-        self.c1 = conv2d_block(in_channels, f, dropout_p=0.10)
+        self.c1 = conv2d_block(in_channels, f)
         self.p1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.c2 = conv2d_block(f, f * 2, dropout_p=0.10)
+        self.c2 = conv2d_block(f, f * 2)
         self.p2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.c3 = conv2d_block(f * 2, f * 4, dropout_p=0.20)
+        self.c3 = conv2d_block(f * 2, f * 4)
         self.p3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.c4 = conv2d_block(f * 4, f * 8, dropout_p=0.20)
+        self.c4 = conv2d_block(f * 4, f * 8)
         self.p4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         # Bottleneck
-        self.c5 = conv2d_block(f * 8, f * 16, dropout_p=0.30)
+        self.c5 = conv2d_block(f * 8, f * 16)
 
         # Decoder
         self.u6 = nn.ConvTranspose2d(f * 16, f * 8, kernel_size=2, stride=2)
-        self.c6 = conv2d_block(f * 16, f * 8, dropout_p=0.20)   # concat: (f*8 from skip) + (f*8 up)
+        self.c6 = conv2d_block(f * 16, f * 8)   # concat: (f*8 from skip) + (f*8 up)
 
         self.u7 = nn.ConvTranspose2d(f * 8, f * 4, kernel_size=2, stride=2)
-        self.c7 = conv2d_block(f * 8, f * 4, dropout_p=0.20)
+        self.c7 = conv2d_block(f * 8, f * 4)
 
         self.u8 = nn.ConvTranspose2d(f * 4, f * 2, kernel_size=2, stride=2, output_padding=1)
-        self.c8 = conv2d_block(f * 4, f * 2, dropout_p=0.10)
+        self.c8 = conv2d_block(f * 4, f * 2)
 
         self.u9 = nn.ConvTranspose2d(f * 2, f, kernel_size=2, stride=2)
-        self.c9 = conv2d_block(f * 2, f, dropout_p=0.10)
+        self.c9 = conv2d_block(f * 2, f)
 
         # Output
         self.outputs = nn.Sequential(
@@ -117,7 +115,7 @@ class UNet(nn.Module):
 """
 
 if __name__ == '__main__':
-    input_img = torch.Tensor(np.load("../data/test_X.npy")[0:3])
+    input_img = torch.Tensor(np.load("../data/test_X.npy"))
     model = UNet()
     print(input_img.shape)
     print(model(input_img).shape)
