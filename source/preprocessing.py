@@ -35,7 +35,7 @@ def load_images_and_masks(split):
         mask_path = os.path.join(masks_dir, mask_name)
 
         if not os.path.exists(mask_path):
-            print("Nedostaje maska za:", fname)
+            print("Missing mask for:", fname)
             continue
 
         img  = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
