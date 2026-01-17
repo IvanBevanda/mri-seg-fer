@@ -39,10 +39,10 @@ There's a `scripts/` folder containing `populate_data.py` which will create `tra
 # Defined interface and tasks:
 
 - [x] Create a GitHub repo with the project skeleton in place.
-- [ ] Implement the UNet model -- inside `models.py`. 
+- [x] Implement the UNet model -- inside `models.py`. 
     - It should output in the form `(BATCH_SIZE, 2, WIDTH, HEIGHT)` and take inputs of the form `(BATCH_SIZE, 1, WIDTH, HEIGHT)`.
-- [ ] Implement the validation loop -- inside `training.py`, specifically `eval_model()`.
-- [ ] Implement preprocessing -- inside `source/preprocessing/`. 
+- [x] Implement the validation loop -- inside `training.py`, specifically `eval_model()`.
+- [x] Implement preprocessing -- inside `source/preprocessing/`. 
     - It should create `train_X.npy`, `train_Y.npy`, `test_X.npy`, `test_Y.npy`. 
     - `X`s have shape `(1, WIDTH, HEIGHT)`, and `Y`s have shape `(1, WIDTH, HEIGHT)` -- the same, but different from model output (because of `CrossEntropyLoss`).
     - Find an appropriate dataset with *one channel* inputs and *one channel* outputs -- check with me if unsure.
