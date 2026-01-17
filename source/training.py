@@ -5,9 +5,10 @@ import importlib
 import torch
 import numpy as np
 import tqdm
+import logging
 
 # Training config
-NUM_EPOCHS = 10
+NUM_EPOCHS = 2
 BATCH_SIZE = 8
 OPTIM_CONFIG = {"lr": 1e-4}
 SELECTED_MODEL = "UNet"
@@ -18,6 +19,10 @@ X_TRAIN_PATH = "output/train_X.npy"
 Y_TRAIN_PATH = "output/train_Y.npy"
 X_TEST_PATH = "output/test_X.npy"
 Y_TEST_PATH = "output/test_Y.npy"
+# Change manually! Create .../expN directory manually!
+EXPPATH = "output/experiments/exp1/"
+LOGFILE = EXPPATH + "training.log"
+PARAMFILE = EXPPATH + "params.pth"
 
 if torch.cuda.is_available():
     DEVICE = torch.device("cuda")
@@ -81,6 +86,7 @@ def eval_model(model, loss_function, testx_path, testy_path, batch_size):
 
     return total_loss
 
+
 def train_network(
     selected_model,
     optim_config,
@@ -92,26 +98,50 @@ def train_network(
     testx_path,
     testy_path,
     num_epochs,
+    logger,
+    paramfile,
 ):
 
     model = getattr(models, selected_model)(*MODEL_CONFIG).float().to(DEVICE)
     optimizer = optim.Adam(
         model.parameters(), **optim_config
     )  # TODO: Move optimizer selection into configs above
-    loss_function = dynamic_import_loss_function(selected_loss_function)(*LF_CONFIG).to(
+    loss_function = dynamic_import_loss_function(selected_loss_function)(*lf_config).to(
         DEVICE
     )
+
+    min_test_loss = np.inf
 
     for epoch in range(num_epochs):
         train_loss = train_epoch(
             model, optimizer, loss_function, trainx_path, trainy_path, batch_size
         )
         test_loss = eval_model(model, loss_function, testx_path, testy_path, 1)
+        logger.info(
+            f"EPOCH {epoch}:\nTRAINING_LOSS: {train_loss}\nTESTING_LOSS: {test_loss}"
+        )
         print(f"Epoch {epoch} training loss: {train_loss}")
         print(f"Epoch {epoch} testing loss: {test_loss}")
 
+        if test_loss < min_test_loss:
+            min_test_loss = test_loss
+            torch.save(model.state_dict(), paramfile)
+
 
 if __name__ == "__main__":
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(filename=LOGFILE, level=logging.INFO)
+    logger.info(
+        f"""Started training run with hyperparameters:
+BATCH_SIZE: {BATCH_SIZE}
+SELECTED_MODEL: {SELECTED_MODEL}
+OPTIMIZER: Adam
+LEARNING_RATE: {OPTIM_CONFIG['lr']}
+LOSS_FUNCTION: {SELECTED_LOSS_FUNCTION}
+LOSS_FUNCTION_CONFIG: {LF_CONFIG}
+"""
+    )
+
     train_network(
         SELECTED_MODEL,
         OPTIM_CONFIG,
@@ -123,4 +153,6 @@ if __name__ == "__main__":
         X_TEST_PATH,
         Y_TEST_PATH,
         NUM_EPOCHS,
+        logger,
+        PARAMFILE,
     )

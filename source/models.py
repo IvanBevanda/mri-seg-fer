@@ -2,9 +2,12 @@ import torch
 import torch.nn as nn
 import numpy as np
 
+
 class UNet(nn.Module):
 
-    def __init__(self, in_channels=1, out_channels=2, base_filters=16, apply_sigmoid=False):
+    def __init__(
+        self, in_channels=1, out_channels=2, base_filters=16, apply_sigmoid=False
+    ):
         super(UNet, self).__init__()
         self.apply_sigmoid = apply_sigmoid
 
@@ -13,7 +16,6 @@ class UNet(nn.Module):
                 nn.Conv2d(cin, cout, kernel_size=3, padding=1, bias=False),
                 nn.BatchNorm2d(cout),
                 nn.ReLU(inplace=True),
-
                 nn.Conv2d(cout, cout, kernel_size=3, padding=1, bias=False),
                 nn.BatchNorm2d(cout),
                 nn.ReLU(inplace=True),
@@ -39,7 +41,7 @@ class UNet(nn.Module):
 
         # Decoder
         self.u6 = nn.ConvTranspose2d(f * 16, f * 8, kernel_size=2, stride=2)
-        self.c6 = conv2d_block(f * 16, f * 8)   # concat: (f*8 from skip) + (f*8 up)
+        self.c6 = conv2d_block(f * 16, f * 8)  # concat: (f*8 from skip) + (f*8 up)
 
         self.u7 = nn.ConvTranspose2d(f * 8, f * 4, kernel_size=2, stride=2)
         self.c7 = conv2d_block(f * 8, f * 4)
@@ -51,9 +53,7 @@ class UNet(nn.Module):
         self.c9 = conv2d_block(f * 2, f)
 
         # Output
-        self.outputs = nn.Sequential(
-            nn.Conv2d(f, out_channels, kernel_size=1)
-        )
+        self.outputs = nn.Sequential(nn.Conv2d(f, out_channels, kernel_size=1))
 
     def forward(self, x):
         # Encoder
@@ -114,7 +114,7 @@ class UNet(nn.Module):
         return self.placeholder(x)
 """
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     input_img = torch.Tensor(np.load("../data/test_X.npy"))
     model = UNet()
     print(input_img.shape)

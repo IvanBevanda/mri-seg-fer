@@ -25,7 +25,9 @@ def check_dataset(X, Y, name="dataset"):
     problems = 0
     for i in range(len(X)):
         if X[i].shape != Y[i].shape:
-            print(f"{name}: Shape mismatch on index {i} -> X: {X[i].shape}, Y: {Y[i].shape}")
+            print(
+                f"{name}: Shape mismatch on index {i} -> X: {X[i].shape}, Y: {Y[i].shape}"
+            )
             problems += 1
         elif X[i].max() > 1.0 or X[i].min() < 0.0:
             print(f"{name}: Pixel values outside [0,1] on index {i}")
@@ -48,8 +50,8 @@ print("Image shape :", train_X[r].shape)
 print("Mask shape :", train_Y[r].shape)
 
 fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-ax[0].imshow(train_X[r].squeeze(), cmap='gray')
+ax[0].imshow(train_X[r].squeeze(), cmap="gray")
 ax[0].set_title("MRI Image")
-ax[1].imshow(train_Y[r].squeeze(), cmap='gray')
+ax[1].imshow(train_Y[r].squeeze(), cmap="gray")
 ax[1].set_title("Tumor mask")
 plt.show()
