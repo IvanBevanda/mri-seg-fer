@@ -44,7 +44,7 @@ class UNet(nn.Module):
         self.u7 = nn.ConvTranspose2d(f * 8, f * 4, kernel_size=2, stride=2)
         self.c7 = conv2d_block(f * 8, f * 4)
 
-        self.u8 = nn.ConvTranspose2d(f * 4, f * 2, kernel_size=2, stride=2, output_padding=1)
+        self.u8 = nn.ConvTranspose2d(f * 4, f * 2, kernel_size=2, stride=2)
         self.c8 = conv2d_block(f * 4, f * 2)
 
         self.u9 = nn.ConvTranspose2d(f * 2, f, kernel_size=2, stride=2)

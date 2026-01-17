@@ -14,10 +14,10 @@ SELECTED_MODEL = "UNet"
 MODEL_CONFIG = {}
 SELECTED_LOSS_FUNCTION = "losses_pytorch.dice_loss:DC_and_CE_loss"  # https://github.com/JunMa11/SegLossOdyssey/tree/master
 LF_CONFIG = [{"batch_dice": True, "smooth": 1e-5, "do_bg": False, "square": False}, {}]
-X_TRAIN_PATH = "data/train_X.npy"
-Y_TRAIN_PATH = "data/train_Y.npy"
-X_TEST_PATH = "data/test_X.npy"
-Y_TEST_PATH = "data/test_Y.npy"
+X_TRAIN_PATH = "output/train_X.npy"
+Y_TRAIN_PATH = "output/train_Y.npy"
+X_TEST_PATH = "output/test_X.npy"
+Y_TEST_PATH = "output/test_Y.npy"
 
 if torch.cuda.is_available():
     DEVICE = torch.device("cuda")
@@ -43,8 +43,8 @@ def train_epoch(model, optimizer, loss_function, trainx_path, trainy_path, batch
 
     total_loss = 0
     for x, y in tqdm.tqdm(train_loader):
-        x.to(DEVICE)
-        y.to(DEVICE)
+        x = x.to(DEVICE)
+        y = y.to(DEVICE)
 
         optimizer.zero_grad()
 
