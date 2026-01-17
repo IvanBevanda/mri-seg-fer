@@ -7,6 +7,9 @@ output/
 # config
 source/config.py
 
+# Sanity check scripts
+source/test_visual.py
+
 .idea/
 
 # Byte-compiled / optimized / DLL files
