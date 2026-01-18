@@ -17,14 +17,14 @@ def get_losses(log_file):
     try:
         with open(log_file, "r") as f:
             for line in f:
-                if "Model:" in line:
+                if "SELECTED_MODEL:" in line:
                     model_name = line.split(":")[-1].strip()
-                if "LR:" in line:
+                if "LEARNING_RATE:" in line:
                     lr = float(line.split(":")[-1].strip())
-                if "train_loss" in line and "test_loss" in line:
-                    parts = line.split(",")
-                    train_losses.append(float(parts[0].split("=")[-1]))
-                    test_losses.append(float(parts[1].split("=")[-1]))
+                if "TRAINING_LOSS:" in line:
+                    train_losses.append(float(line.split(":")[-1].strip()))
+                if "TESTING_LOSS:" in line:
+                    test_losses.append(float(line.split(":")[-1].strip()))
     except FileNotFoundError:
         print("Error!")
     return train_losses, test_losses, model_name, lr
