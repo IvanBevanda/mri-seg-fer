@@ -13,3 +13,12 @@ author = {Jun Ma and Jianan Chen and Matthew Ng and Rui Huang and Yu Li and Chen
 doi = {https://doi.org/10.1016/j.media.2021.102035},
 url = {https://www.sciencedirect.com/science/article/pii/S1361841521000815}
 }
+
+UNet++:
+https://link.springer.com/chapter/10.1007/978-3-030-00889-5_1
+
+UNet:
+https://link.springer.com/chapter/10.1007/978-3-319-24574-4_28
+
+Upsampling:
+https://distill.pub/2016/deconv-checkerboard/

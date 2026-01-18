@@ -96,6 +96,100 @@ class UNet(nn.Module):
         return logits
 
 
+# TODO: Refactor so it's actually maintainable
+class UNetPlusPlus(nn.Module):
+
+    def __init__(self, in_channels=1, out_channels=2, base_filters=16):
+        super(UNetPlusPlus, self).__init__()
+
+        def conv2d_block(cin, cout):
+            return nn.Sequential(
+                nn.Conv2d(cin, cout, kernel_size=3, padding=1, bias=False),
+                nn.BatchNorm2d(cout),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(cout, cout, kernel_size=3, padding=1, bias=False),
+                nn.BatchNorm2d(cout),
+                nn.ReLU(inplace=True),
+            )
+
+        f = base_filters
+
+        self.us = nn.Upsample(
+            scale_factor=2
+        )  # https://distill.pub/2016/deconv-checkerboard/
+
+        # Encoder backbone
+        self.x0_0 = conv2d_block(in_channels, f)
+        self.p0_0 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.x1_0 = conv2d_block(f, f * 2)
+        self.p1_0 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.x2_0 = conv2d_block(f * 2, f * 4)
+        self.p2_0 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.x3_0 = conv2d_block(f * 4, f * 8)
+        self.p3_0 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.x4_0 = conv2d_block(f * 8, f * 16)
+
+        # Pyramidal skip layers (see original paper)
+        # Horribly convoluted (pun intended)
+        self.x0_1 = conv2d_block(f + 2 * f, f)
+        self.x0_2 = conv2d_block(f + f + 2 * f, f)
+        self.x0_3 = conv2d_block(f + f + f + 2 * f, f)
+
+        self.x1_1 = conv2d_block(2 * f + 4 * f, 2 * f)
+        self.x1_2 = conv2d_block(2 * f + 2 * f + 4 * f, 2 * f)
+
+        self.x2_1 = conv2d_block(4 * f + 8 * f, 4 * f)
+
+        # Decoder backbone
+        self.x0_4 = conv2d_block(f + f + f + f + 2 * f, f)
+
+        self.x1_3 = conv2d_block(2 * f + 2 * f + 2 * f + 4 * f, 2 * f)
+
+        self.x2_2 = conv2d_block(4 * f + 4 * f + 8 * f, 4 * f)
+
+        self.x3_1 = conv2d_block(8 * f + 16 * f, 8 * f)
+
+        self.output = self.outputs = nn.Sequential(
+            nn.Conv2d(f, out_channels, kernel_size=1)
+        )
+
+    def forward(self, x):
+        # Encoder backbone propagation
+        x0_0 = self.x0_0(x)
+        p0_0 = self.p0_0(x0_0)
+        x1_0 = self.x1_0(p0_0)
+        p1_0 = self.p1_0(x1_0)
+        x2_0 = self.x2_0(p1_0)
+        p2_0 = self.p2_0(x2_0)
+        x3_0 = self.x3_0(p2_0)
+        p3_0 = self.p3_0(x3_0)
+        x4_0 = self.x4_0(p3_0)
+
+        # Layer 2 skip pathway propagation
+        x2_1 = self.x2_1(torch.cat([self.us(x3_0), x2_0], dim=1))
+
+        # Layer 1 skip pathway propagation
+        x1_1 = self.x1_1(torch.cat([x1_0, self.us(x2_0)], dim=1))
+        x1_2 = self.x1_2(torch.cat([x1_0, x1_1, self.us(x2_1)], dim=1))
+
+        # Layer 0 skip pathway propagation
+        x0_1 = self.x0_1(torch.cat([x0_0, self.us(x1_0)], dim=1))
+        x0_2 = self.x0_2(torch.cat([x0_0, x0_1, self.us(x1_1)], dim=1))
+        x0_3 = self.x0_3(torch.cat([x0_0, x0_1, x0_2, self.us(x1_2)], dim=1))
+
+        # Decoder backbone propagation
+        x3_1 = self.x3_1(torch.cat([x3_0, self.us(x4_0)], dim=1))
+        x2_2 = self.x2_2(torch.cat([x2_0, x2_1, self.us(x3_1)], dim=1))
+        x1_3 = self.x1_3(torch.cat([x1_0, x1_1, x1_2, self.us(x2_2)], dim=1))
+        x0_4 = self.x0_4(torch.cat([x0_0, x0_1, x0_2, x0_3, self.us(x1_3)], dim=1))
+
+        return self.output(x0_4)
+
+
 """
 # Just a placeholder
 class UNet(nn.Module):
